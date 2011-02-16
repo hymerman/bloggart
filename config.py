@@ -1,14 +1,14 @@
 # Name of the blog
-blog_name = 'My Blog'
+blog_name = 'Ben\'s blog'
 
 # Your name (used for copyright info)
-author_name = 'the author'
+author_name = 'Ben Hymers'
 
 # (Optional) slogan
-slogan = 'This is my blog'
+slogan = 'Software development, games, and all that jazz'
 
 # The hostname this site will primarially serve off (used for Atom feeds)
-host = 'localhost:8080'
+host = 'blog.benhymers.com'
 
 # Selects the theme to use. Theme names correspond to directories under
 # the 'themes' directory, containing templates and static content.
@@ -25,20 +25,11 @@ page_templates = {
 #   year - the year the post was published in
 #   month - the month the post was published in
 #   day - the day the post was published in
-post_path_format = '/%(year)d/%(month)02d/%(slug)s'
+post_path_format = '/%(year)d/%(month)02d/%(day)02d/%(slug)s'
 
 # A nested list of sidebar menus, for convenience. If this isn't versatile
 # enough, you can edit themes/default/base.html instead.
-sidebars = [
-  ('Blogroll', [
-    '<a href="http://blog.notdot.net/">Nick Johnsonz</a>',
-    '<a href="http://www.billkatz.com/">Bill Katz</a>',
-    '<a href="http://www.codinghorror.com/blog/">Coding Horror</a>',
-    '<a href="http://craphound.com/">Craphound</a>',
-    '<a href="http://www.neopythonic.blogspot.com/">Neopythonic</a>',
-    '<a href="http://www.schneier.com/blog/">Schneier on Security</a>',
-  ]),
-]
+sidebars = []
 
 # Number of entries per page in indexes.
 posts_per_page = 10
@@ -48,13 +39,13 @@ html_mime_type = "text/html; charset=utf-8"
 
 # To use disqus for comments, set this to the 'short name' of the disqus forum
 # created for the purpose.
-disqus_forum = None
+disqus_forum = 'benhymers'
 
 # Length (in words) of summaries, by default
 summary_length = 200
 
 # If you want to use Google Analytics, enter your 'web property id' here
-analytics_id = None
+analytics_id = 'UA-1548272-3'
 
 # If you want to use PubSubHubbub, supply the hub URL to use here.
 hubbub_hub_url = 'http://pubsubhubbub.appspot.com/'
@@ -68,14 +59,14 @@ google_sitemap_ping = True
 # an html file' method, then set the NAME of the file below.
 # Note that you do not need to download the file provided - just enter its name
 # here.
-google_site_verification = None
+google_site_verification = 'google0ee83a2a0b20d857.html'
 
 # Same as above but for Bing site verification. Just enter the user ID you get given.
-bing_site_verification = None
+bing_site_verification = 'D3242206C38110FC20017CBFBC5E7D4C'
 
 # Same again but for Yahoo site verification. Just enter the filename and ID you get given.
-yahoo_site_verification_filename = None
-yahoo_site_verification_id = None
+yahoo_site_verification_filename = 'y_key_0f7937f4685deabd.html'
+yahoo_site_verification_id = 'ff385d1820379755'
 
 # Default markup language for entry bodies (defaults to html).
 default_markup = 'html'
