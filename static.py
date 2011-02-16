@@ -18,10 +18,13 @@ import utils
 
 HTTP_DATE_FMT = "%a, %d %b %Y %H:%M:%S GMT"
 
+ROOT_ONLY_FILES = ['/robots.txt']
+
 if config.google_site_verification is not None:
-    ROOT_ONLY_FILES = ['/robots.txt','/' + config.google_site_verification]
-else:
-    ROOT_ONLY_FILES = ['/robots.txt']
+  ROOT_ONLY_FILES.append('/' + config.google_site_verification)
+
+if config.bing_site_verification is not None:
+  ROOT_ONLY_FILES.append('/LiveSearchSiteAuth.xml')
 
 class StaticContent(db.Model):
   """Container for statically served content.

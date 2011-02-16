@@ -75,14 +75,21 @@ def regenerate_all(previous_version):
 post_deploy_tasks.append(regenerate_all)
 
 
-def site_verification(previous_version):
+def google_site_verification(previous_version):
   static.set('/' + config.google_site_verification,
              utils.render_template('site_verification.html'),
              config.html_mime_type, False)
 
 if config.google_site_verification:
-  post_deploy_tasks.append(site_verification)
+  post_deploy_tasks.append(google_site_verification)
 
+def bing_site_verification(previous_version):
+  static.set('/LiveSearchSiteAuth.xml',
+             utils.render_template('LiveSearchSiteAuth.xml'),
+             config.html_mime_type, False)
+
+if config.bing_site_verification:
+  post_deploy_tasks.append(bing_site_verification)
 
 def run_deploy_task():
   """Attempts to run the per-version deploy task."""

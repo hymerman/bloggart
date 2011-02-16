@@ -70,6 +70,9 @@ google_sitemap_ping = True
 # here.
 google_site_verification = None
 
+# Same as above but for Bing site verification. Just enter the user ID you get given.
+bing_site_verification = None
+
 # Default markup language for entry bodies (defaults to html).
 default_markup = 'html'
 
