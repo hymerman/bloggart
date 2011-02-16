@@ -91,6 +91,14 @@ def bing_site_verification(previous_version):
 if config.bing_site_verification:
   post_deploy_tasks.append(bing_site_verification)
 
+def yahoo_site_verification(previous_version):
+  static.set('/' + config.yahoo_site_verification_filename,
+             utils.render_template('yahoo_site_verification.html'),
+             config.html_mime_type, False)
+
+if config.yahoo_site_verification_filename and config.yahoo_site_verification_id:
+  post_deploy_tasks.append(yahoo_site_verification)
+
 def run_deploy_task():
   """Attempts to run the per-version deploy task."""
   task_name = 'deploy-%s' % os.environ['CURRENT_VERSION_ID'].replace('.', '-')

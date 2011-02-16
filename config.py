@@ -73,6 +73,10 @@ google_site_verification = None
 # Same as above but for Bing site verification. Just enter the user ID you get given.
 bing_site_verification = None
 
+# Same again but for Yahoo site verification. Just enter the filename and ID you get given.
+yahoo_site_verification_filename = None
+yahoo_site_verification_id = None
+
 # Default markup language for entry bodies (defaults to html).
 default_markup = 'html'
 
