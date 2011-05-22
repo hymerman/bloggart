@@ -24,7 +24,7 @@ if config.google_site_verification is not None:
   ROOT_ONLY_FILES.append('/' + config.google_site_verification)
 
 if config.bing_site_verification is not None:
-  ROOT_ONLY_FILES.append('/LiveSearchSiteAuth.xml')
+  ROOT_ONLY_FILES.append('/BingSiteAuth.xml')
 
 if config.yahoo_site_verification_filename is not None and config.yahoo_site_verification_id is not None:
   ROOT_ONLY_FILES.append('/' + config.yahoo_site_verification_filename)

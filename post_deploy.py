@@ -84,8 +84,8 @@ if config.google_site_verification:
   post_deploy_tasks.append(google_site_verification)
 
 def bing_site_verification(previous_version):
-  static.set('/LiveSearchSiteAuth.xml',
-             utils.render_template('LiveSearchSiteAuth.xml'),
+  static.set('/BingSiteAuth.xml',
+             utils.render_template('BingSiteAuth.xml'),
              config.html_mime_type, False)
 
 if config.bing_site_verification:
