@@ -11,7 +11,7 @@ import models
 import post_deploy
 import utils
 
-from django import newforms as forms
+from django import forms
 from google.appengine.ext.db import djangoforms
 
 
@@ -58,6 +58,7 @@ class BaseHandler(webapp.RequestHandler):
 
 class AdminHandler(BaseHandler):
   def get(self):
+    from generators import generator_list
     offset = int(self.request.get('start', 0))
     count = int(self.request.get('count', 20))
     posts = models.BlogPost.all().order('-published').fetch(count, offset)
@@ -68,6 +69,7 @@ class AdminHandler(BaseHandler):
         'prev_offset': max(0, offset - count),
         'next_offset': offset + count,
         'posts': posts,
+        'generators': [cls.__name__ for cls in generator_list],
     }
     self.render_to_response("index.html", template_vals)
 
@@ -91,7 +93,7 @@ class PostHandler(BaseHandler):
                     initial={'draft': post and post.published is None})
     if form.is_valid():
       post = form.save(commit=False)
-      if form.clean_data['draft']:# Draft post
+      if form.cleaned_data['draft']:# Draft post
         post.published = datetime.datetime.max
         post.put()
       else:
@@ -99,10 +101,10 @@ class PostHandler(BaseHandler):
           post.updated = post.published = datetime.datetime.now()
         else:# Edit post
           post.updated = datetime.datetime.now()
-        post.publish()
+        post.publish(regenerate=True)
       self.render_to_response("published.html", {
           'post': post,
-          'draft': form.clean_data['draft']})
+          'draft': form.cleaned_data['draft']})
     else:
       self.render_form(form)
 
@@ -131,9 +133,11 @@ class PreviewHandler(BaseHandler):
 
 class RegenerateHandler(BaseHandler):
   def post(self):
-    deferred.defer(post_deploy.PostRegenerator().regenerate)
-    deferred.defer(post_deploy.PageRegenerator().regenerate)
-    deferred.defer(post_deploy.try_post_deploy, force=True)
+    generators = self.request.get_all("generators")
+
+    deferred.defer(post_deploy.try_post_deploy, force=True, regenerate_kwargs={
+      'classes': generators
+    })
     self.render_to_response("regenerating.html")
 
 

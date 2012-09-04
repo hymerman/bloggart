@@ -1,3 +1,9 @@
+# Choose django version
+from google.appengine.dist import use_library
+use_library('django', '1.2')
+
+from django.utils.safestring import mark_safe
+
 # Name of the blog
 blog_name = 'My Blog'
 
@@ -12,7 +18,7 @@ host = 'localhost:8080'
 
 # Selects the theme to use. Theme names correspond to directories under
 # the 'themes' directory, containing templates and static content.
-theme = 'default'
+theme = 'coolblue'
 
 # List of page templates
 page_templates = {
@@ -31,12 +37,12 @@ post_path_format = '/%(year)d/%(month)02d/%(slug)s'
 # enough, you can edit themes/default/base.html instead.
 sidebars = [
   ('Blogroll', [
-    '<a href="http://blog.notdot.net/">Nick Johnsonz</a>',
-    '<a href="http://www.billkatz.com/">Bill Katz</a>',
-    '<a href="http://www.codinghorror.com/blog/">Coding Horror</a>',
-    '<a href="http://craphound.com/">Craphound</a>',
-    '<a href="http://www.neopythonic.blogspot.com/">Neopythonic</a>',
-    '<a href="http://www.schneier.com/blog/">Schneier on Security</a>',
+    mark_safe('<a href="http://blog.notdot.net/">Nick Johnsonz</a>'),
+    mark_safe('<a href="http://www.billkatz.com/">Bill Katz</a>'),
+    mark_safe('<a href="http://www.codinghorror.com/blog/">Coding Horror</a>'),
+    mark_safe('<a href="http://craphound.com/">Craphound</a>'),
+    mark_safe('<a href="http://www.neopythonic.blogspot.com/">Neopythonic</a>'),
+    mark_safe('<a href="http://www.schneier.com/blog/">Schneier on Security</a>'),
   ]),
 ]
 
