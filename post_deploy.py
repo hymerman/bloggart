@@ -17,12 +17,14 @@ class PostRegenerator(object):
   def __init__(self):
     self.seen = set()
 
-  def regenerate(self, batch_size=50, start_ts=None):
+  def regenerate(self, batch_size=50, start_ts=None, classes=None):
     q = models.BlogPost.all().order('-published')
     q.filter('published <', start_ts or datetime.datetime.max)
     posts = q.fetch(batch_size)
     for post in posts:
       for generator_class, deps in post.get_deps(True):
+        if classes and (not generator_class.__name__ in classes):
+          continue
         for dep in deps:
           if (generator_class.__name__, dep) not in self.seen:
             logging.warn((generator_class.__name__, dep))
@@ -50,7 +52,7 @@ post_deploy_tasks = []
 
 
 def generate_static_pages(pages):
-  def generate(previous_version):
+  def generate(previous_version, **kwargs):
     for path, template, indexed in pages:
       rendered = utils.render_template(template)
       static.set(path, rendered, config.html_mime_type, indexed)
@@ -63,19 +65,19 @@ post_deploy_tasks.append(generate_static_pages([
 ]))
 
 
-def regenerate_all(previous_version):
-  if (
+def regenerate_all(previous_version, force=False, **kwargs):
+  if force or (
     previous_version.bloggart_major,
     previous_version.bloggart_minor,
     previous_version.bloggart_rev,
   ) < BLOGGART_VERSION:
     regen = PostRegenerator()
-    deferred.defer(regen.regenerate)
+    deferred.defer(regen.regenerate, **kwargs.get('regenerate_kwargs', {}))
 
 post_deploy_tasks.append(regenerate_all)
 
 
-def google_site_verification(previous_version):
+def google_site_verification(previous_version, **kwargs):
   static.set('/' + config.google_site_verification,
              utils.render_template('site_verification.html'),
              config.html_mime_type, False)
@@ -108,7 +110,7 @@ def run_deploy_task():
     pass
 
 
-def try_post_deploy(force=False):
+def try_post_deploy(force=False, **kwargs):
   """
   Runs post_deploy() if it has not been run for this version yet.
 
@@ -139,16 +141,16 @@ def try_post_deploy(force=False):
     else:
       post_deploy(version_info)
   elif force: # also implies version_info is available
-    post_deploy(version_info, is_new=False)
+    post_deploy(version_info, is_new=False, force=True, **kwargs)
 
-def post_deploy(previous_version, is_new=True):
+def post_deploy(previous_version, is_new=True, **kwargs):
   """
   Carries out post-deploy functions, such as rendering static pages.
 
   If is_new is true, a new VersionInfo entity will be created.
   """
   for task in post_deploy_tasks:
-    task(previous_version)
+    task(previous_version, **kwargs)
 
   # don't proceed to create a VersionInfo entity
   if not is_new:

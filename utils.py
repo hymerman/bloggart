@@ -2,14 +2,17 @@ import os
 import re
 import unicodedata
 
+from google.appengine.api import memcache
 from google.appengine.ext import webapp
+
+import config
+
+# requires django internally
 from google.appengine.ext.webapp.template import _swap_settings
 
 import django.conf
 from django import template
 from django.template import loader
-
-import config
 
 BASE_DIR = os.path.dirname(__file__)
 
@@ -51,6 +54,11 @@ def get_template_vals_defaults(template_vals=None):
 
 
 def render_template(template_name, template_vals=None, theme=None):
+  # side-step internal register mechanism
+  if not template.libraries.get('bloggart_tags', None):
+    import bloggart_tags as tag_lib
+    template.libraries['bloggart_tags'] = tag_lib.register
+
   template_vals = get_template_vals_defaults(template_vals)
   template_vals.update({'template_name': template_name})
   old_settings = _swap_settings({'TEMPLATE_DIRS': TEMPLATE_DIRS})
@@ -138,3 +146,41 @@ def tz_field(property):
     return property.replace(tzinfo=UTC()).astimezone(tz)
   else:
     return property
+
+
+class memoize_post(object):
+  """
+  A memcache-based memoizer for BlogPosts; keys are the post's path.
+  """
+  def __init__(self, namespace):
+    self.namespace = namespace
+
+  def __call__(self, func):
+    def _dec(post):
+      if post.path:
+        data = memcache.get(post.path, namespace=self.namespace)
+        if data:
+          return data
+        else:
+          data = func(post)
+          memcache.set(post.path, data, namespace=self.namespace)
+          return data
+      else:
+        return func(post)
+    return _dec
+
+  def delete(self, post):
+    if post.path:
+      memcache.delete(post.path, namespace=self.namespace)
+
+
+body_memoizer = memoize_post('BlogPost.rendered')
+summary_memoizer = memoize_post('BlogPost.summary')
+hash_memoizer = memoize_post('BlogPost.hash')
+summary_hash_memoizer = memoize_post('BlogPost.summary_hash')
+
+def clear_memoizer_cache(post):
+  body_memoizer.delete(post)
+  summary_memoizer.delete(post)
+  hash_memoizer.delete(post)
+  summary_hash_memoizer.delete(post)

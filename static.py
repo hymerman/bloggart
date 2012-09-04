@@ -7,13 +7,14 @@ from google.appengine.ext import db
 from google.appengine.ext import deferred
 from google.appengine.datastore import entity_pb
 from google.appengine.ext import webapp
-from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 import fix_path
 import aetycoon
 import config
 import utils
+
+from django.utils import encoding
 
 
 HTTP_DATE_FMT = "%a, %d %b %Y %H:%M:%S GMT"
@@ -81,7 +82,7 @@ def set(path, body, content_type, indexed=True, **kwargs):
   defaults.update(kwargs)
   content = StaticContent(
       key_name=path,
-      body=body,
+      body=encoding.smart_str(body),
       content_type=content_type,
       indexed=indexed,
       **defaults)
@@ -126,6 +127,14 @@ def remove(path):
     content.delete()
   return db.run_in_transaction(_tx)
 
+def canonical_redirect(func):
+  def _dec(self, path):
+    if not self.request.host == config.host:
+      self.redirect("%s://%s%s" % (self.request.scheme, config.host, path), True)
+    else:
+      func(self, path)
+  return _dec
+
 class StaticContentHandler(webapp.RequestHandler):
   def output_content(self, content, serve=True):
     if content.content_type:
@@ -142,6 +151,7 @@ class StaticContentHandler(webapp.RequestHandler):
     else:
       self.response.set_status(304)
 
+  @canonical_redirect
   def get(self, path):
     if not path.startswith(config.url_prefix):
       if path not in ROOT_ONLY_FILES:
